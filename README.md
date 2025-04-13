@@ -35,11 +35,12 @@ cargo run
 ```
 
 ## TODO
-* Rewrite implementation in Rust for performance
+* ~~Rewrite implementation in Rust for performance~~
 * Develop GUI interface
 * Add data visualization capabilities
 * Increase video limit beyond 50
-* Add CSV/Excel export functionality
+* ~~Add CSV/JSON export functionality~~
+* Logger
 
 ## Limitations
 * Currently limited to analyzing 50 most recent videos per channel
