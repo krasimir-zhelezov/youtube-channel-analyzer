@@ -46,4 +46,4 @@ cargo run
 
 ## License
 This project is licensed under the **GNU General Public License**.  
-See [LICENSE](LICENSE) for the full text.
+See [LICENSE](https://github.com/krasimir-zhelezov/youtube-channel-analyzer?tab=License-1-ov-file) for the full text.
