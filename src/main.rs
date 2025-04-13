@@ -3,6 +3,7 @@ use std::{collections::HashMap, env, error::Error, fs};
 use reqwest;
 use serde::{Serialize, Deserialize};
 use serde_json::Value;
+use csv::Writer;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Video {
@@ -36,7 +37,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     // println!("{:?}", videos[0]);
 
-    save_data_to_json(&videos);
+    let _ = save_data_to_json(&videos);
+    let _ = save_data_to_csv(&videos);
 
     Ok(())
 }
@@ -161,5 +163,17 @@ async fn get_videos_by_channel_id(channel_id: &str, api_key: &str) -> Result<Vec
 fn save_data_to_json(data: &[Video]) -> Result<(), Box<dyn Error>> {
     let json = serde_json::to_string_pretty(data)?;
     fs::write("data.json", json)?;
+    Ok(())
+}
+
+fn save_data_to_csv(data: &[Video]) -> Result<(), Box<dyn Error>> {
+    let mut writer = Writer::from_path("data.csv")?;
+
+    for video in data {
+        writer.serialize(video)?;
+    }
+
+    writer.flush()?;
+    drop(writer);
     Ok(())
 }
