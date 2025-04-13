@@ -12,9 +12,8 @@ A Rust tool that fetches and analyzes video data from YouTube channels using the
 
 ## Prerequisites
 
-- Python 3.11+
+- Rust
 - YouTube Data API v3 key
-- Required Python packages (see Installation)
 
 ## Installation
 
@@ -24,12 +23,7 @@ A Rust tool that fetches and analyzes video data from YouTube channels using the
    cd youtube-channel-analyzer
    ```
 
-2. Install required packages:
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-3. Create a .env file in the project root and add your YouTube API key:
+2. Create a .env file in the project root and add your YouTube API key:
     ```env
     API_KEY=your_youtube_api_key_here
     ```
