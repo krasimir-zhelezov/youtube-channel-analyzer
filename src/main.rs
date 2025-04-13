@@ -1,5 +1,5 @@
 use dotenv::dotenv;
-use std::{collections::HashMap, env, error::Error, fs};
+use std::{collections::HashMap, env, error::Error, fs, io::{self, Write}};
 use reqwest;
 use serde::{Serialize, Deserialize};
 use serde_json::Value;
@@ -22,23 +22,34 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let api_key = env::var("API_KEY")
         .unwrap();
 
-    println!("API_KEY: {}", api_key);
+    // println!("API_KEY: {}", api_key);
+    
+    let mut input = String::new();
 
-    let username = "AnnaCramling".to_string();
+    print!("Enter youtube username: @");
+    io::stdout().flush().unwrap();
+
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Failed to read line");
+
+
+    let username = input.trim();
+
+    println!("Searching for channel...");
     let channel_id = get_channel_id(&username, &api_key).await?;
-    println!("Channel ID: {}", channel_id);
+    println!("Channel found.");
+    // println!("Channel ID: {}", channel_id);
 
-    // let video = get_video_by_id("Ff-f2tximdI", &api_key).await?;
-    // println!("Video: {}", video.title);
-
-
-
+    println!("Collecting videos...");
     let videos = get_videos_by_channel_id(&channel_id, &api_key).await?;
 
-    // println!("{:?}", videos[0]);
+    println!("Videos collected.");
 
     let _ = save_data_to_json(&videos);
     let _ = save_data_to_csv(&videos);
+
+    println!("Data saved.");
 
     Ok(())
 }
@@ -144,8 +155,6 @@ async fn get_videos_by_channel_id(channel_id: &str, api_key: &str) -> Result<Vec
     params.insert("key", api_key);
 
     let data = make_request(&url, &params).await?;
-
-    println!("get_videos_by_channel_id");
 
     if let Some(items) = data["items"].as_array() {
         for item in items {
