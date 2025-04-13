@@ -3,6 +3,7 @@ use std::{collections::HashMap, env, error::Error};
 use reqwest;
 use serde_json::Value;
 
+#[derive(Debug)]
 pub struct Video {
     pub url: String,
     pub title: String,
@@ -21,12 +22,18 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     println!("API_KEY: {}", api_key);
 
-    // let username = "kenforrest".to_string();
-    // let channel_id = get_channel_id(&username, &api_key).await?;
-    // println!("Channel ID: {}", channel_id);
+    let username = "AnnaCramling".to_string();
+    let channel_id = get_channel_id(&username, &api_key).await?;
+    println!("Channel ID: {}", channel_id);
 
-    let video = get_video_by_id("Ff-f2tximdI", &api_key).await?;
-    println!("Video: {}", video.title);
+    // let video = get_video_by_id("Ff-f2tximdI", &api_key).await?;
+    // println!("Video: {}", video.title);
+
+
+
+    let videos = get_videos_by_channel_id(&channel_id, &api_key).await?;
+
+    println!("{:?}", videos[0]);
 
     Ok(())
 }
@@ -116,4 +123,34 @@ async fn get_video_by_id(video_id: &str, api_key: &str) -> Result<Video, Box<dyn
         view_count,
         tags: Some(tags)
     })
+}
+
+async fn get_videos_by_channel_id(channel_id: &str, api_key: &str) -> Result<Vec<Video>, Box<dyn Error>> {
+    let mut videos = Vec::new();
+    let url = "https://www.googleapis.com/youtube/v3/search";
+
+    let mut params = HashMap::new();
+
+    params.insert("part", "snippet");
+    params.insert("channelId", channel_id);
+    params.insert("maxResults", "50");
+    params.insert("order", "date");
+    params.insert("type", "video");
+    params.insert("key", api_key);
+
+    let data = make_request(&url, &params).await?;
+
+    println!("get_videos_by_channel_id");
+
+    if let Some(items) = data["items"].as_array() {
+        for item in items {
+            let id = item["id"]["videoId"].as_str().unwrap();
+            
+            let video = get_video_by_id(&id, &api_key).await?;
+
+            videos.push(video);
+        }
+    }
+
+    Ok(videos)
 }
