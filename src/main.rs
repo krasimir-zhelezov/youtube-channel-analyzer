@@ -1,9 +1,10 @@
 use dotenv::dotenv;
-use std::{collections::HashMap, env, error::Error};
+use std::{collections::HashMap, env, error::Error, fs};
 use reqwest;
+use serde::{Serialize, Deserialize};
 use serde_json::Value;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Video {
     pub url: String,
     pub title: String,
@@ -33,7 +34,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let videos = get_videos_by_channel_id(&channel_id, &api_key).await?;
 
-    println!("{:?}", videos[0]);
+    // println!("{:?}", videos[0]);
+
+    save_data_to_json(&videos);
 
     Ok(())
 }
@@ -153,4 +156,10 @@ async fn get_videos_by_channel_id(channel_id: &str, api_key: &str) -> Result<Vec
     }
 
     Ok(videos)
+}
+
+fn save_data_to_json(data: &[Video]) -> Result<(), Box<dyn Error>> {
+    let json = serde_json::to_string_pretty(data)?;
+    fs::write("data.json", json)?;
+    Ok(())
 }
