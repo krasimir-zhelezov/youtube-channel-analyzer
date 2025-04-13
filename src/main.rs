@@ -21,18 +21,24 @@ async fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-async fn get_channel_id(username: String, api_key: &str) -> Result<String, Box<dyn Error>> {
+async fn make_request(url: &str) -> Result<Value, Box<dyn Error>> {
     let client = reqwest::Client::new();
 
     let response = client
-        .get(&format!("https://www.googleapis.com/youtube/v3/search?part=snippet&q={}&type=channel&maxResults=1&key={}", username, api_key))
+        .get(url)
         .send()
         .await?;
 
     let json: Value = response.json().await?;
 
+    Ok(json)
+}
+
+async fn get_channel_id(username: String, api_key: &str) -> Result<String, Box<dyn Error>> {
+    let data = make_request(&format!("https://www.googleapis.com/youtube/v3/search?part=snippet&q={}&type=channel&maxResults=1&key={}", username, api_key)).await?;
+
     // Properly extract the channel ID from YouTube's search response
-    let channel_id = json["items"][0]["id"]["channelId"]
+    let channel_id = data["items"][0]["id"]["channelId"]
         .as_str()
         .ok_or("Channel ID not found in response")?
         .to_string();
